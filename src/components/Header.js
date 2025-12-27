@@ -118,12 +118,12 @@ export default function Headers() {
         >
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <Image src="/Logo.png" alt="D Square Logo" width={50} height={50} />
-                <span style={{ fontSize: 26, fontWeight: 900 }}>
-                    <span style={{ color: primaryColor }}>Jupi</span>
-                    <span style={{ color: secondaryColor }}>Next</span>
-                    {/* <span style={{ color: accentColor }}>Infotech</span> */}
-                </span>
+                <Image src="/JupiNextIcon.png" alt="JupiNext Logo" width={50} height={50} />
+                <Image src="/JupiNextName.png"
+                    alt="JupiNext Name Logo"
+                    width={250}
+                    height={100}
+                    prioritys />
             </div>
 
             {/* Desktop Menu */}

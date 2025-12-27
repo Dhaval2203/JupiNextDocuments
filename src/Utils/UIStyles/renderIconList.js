@@ -19,7 +19,7 @@ export function renderIconList(items) {
     return items.map((item, index) => (
         <View key={index} style={styles.iconLine}>
             <Image
-                src="/Logo.png"
+                src="/JupiNextIcon.png"
                 alt="Checkmark Icon"
                 style={styles.iconBox}
             />

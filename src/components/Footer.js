@@ -66,12 +66,12 @@ export default function FooterComponent() {
                         {new Date().getFullYear()}
                     </span>
 
-                    <span style={{ color: primaryColor }}>D Square</span>
+                    <span style={{ color: primaryColor }}>JupiNext</span>
 
                     <span className="desktop-only">-</span>
 
                     <span style={{ color: secondaryColor }}>
-                        Unlock the Future
+                        Where the Next Begins
                     </span>
 
                     <span className="desktop-only">·</span>
