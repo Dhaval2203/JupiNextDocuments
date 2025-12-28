@@ -213,7 +213,7 @@ export const SalarySlipPDF = ({ data, totals }) => {
             <Page size="A4" style={styles.page}>
                 {/* Water Mark */}
                 <Image
-                    src="/JupiNextName.png"
+                    src="/JupiNext_Icon.png"
                     alt="Watermark"
                     style={{
                         position: 'absolute',
@@ -229,12 +229,10 @@ export const SalarySlipPDF = ({ data, totals }) => {
 
                 {/* Header */}
                 <View style={styles.headerSection}>
-                    <Image src="/JupiNextName.png" alt="Logo" style={styles.logo} />
+                    <Image src="/JupiNext_Icon.png" alt="Logo" style={styles.logo} />
                     <View style={styles.companyBlock}>
                         <View style={styles.companyNameRow}>
-                            <Text style={styles.companyNamePrimary}>Jupi</Text>
-                            <Text style={styles.companyNameSecondary}>Next</Text>
-                            {/* <Text style={styles.companyNameAccent}>Infotech</Text> */}
+                            <Image src="/JupiNextName.png" alt="Logo" style={styles.logo} />
                         </View>
                         <Text style={styles.companyEmail}>{companyEmail}</Text>
                     </View>
