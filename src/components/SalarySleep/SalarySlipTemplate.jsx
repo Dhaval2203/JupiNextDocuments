@@ -183,9 +183,9 @@ const styles = StyleSheet.create({
         width: 55,
         height: 55,
         position: 'absolute',
-        bottom: 40,
-        right: 40,
-        opacity: 0.9,
+        // bottom: 40,
+        // right: 40,
+        // opacity: 0.9,
     },
 
     /* ---------------- Footer ---------------- */
