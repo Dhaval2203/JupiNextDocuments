@@ -173,7 +173,7 @@ export default function OfferLetterTemplate({
                 <View style={styles.topBar} />
 
                 {/* Watermark */}
-                <Image src="/Logo.png" alt='Logo' style={styles.watermark} />
+                <Image src="/JupiNextName.png" alt='Logo' style={styles.watermark} />
 
                 <View style={styles.content}>
                     {/* Logo Header */}

@@ -71,7 +71,7 @@ export default function ExperienceLetterPositiveTemplate({ employee, joiningDate
         <Document>
             <Page size="A4" style={styles.page}>
                 <View style={styles.topBar} />
-                <Image src="/Logo.png" alt="Watermark" style={styles.watermark} />
+                <Image src="/JupiNextName.png" alt="Watermark" style={styles.watermark} />
                 <View style={styles.content}>
                     <View style={styles.header}>
                         <Image src="/JupiNextName.png" alt="Company Logo" style={styles.logo} />

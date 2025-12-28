@@ -213,7 +213,7 @@ export const SalarySlipPDF = ({ data, totals }) => {
             <Page size="A4" style={styles.page}>
                 {/* Water Mark */}
                 <Image
-                    src="/Logo.png"
+                    src="/JupiNextName.png"
                     alt="Watermark"
                     style={{
                         position: 'absolute',
@@ -229,7 +229,7 @@ export const SalarySlipPDF = ({ data, totals }) => {
 
                 {/* Header */}
                 <View style={styles.headerSection}>
-                    <Image src="/Logo.png" alt="Logo" style={styles.logo} />
+                    <Image src="/JupiNextName.png" alt="Logo" style={styles.logo} />
                     <View style={styles.companyBlock}>
                         <View style={styles.companyNameRow}>
                             <Text style={styles.companyNamePrimary}>Jupi</Text>
