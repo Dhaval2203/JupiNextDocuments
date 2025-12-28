@@ -1,18 +1,12 @@
 'use client';
 
 import {
-    Card,
-    Table,
-    Input,
-    Select,
-    Row,
-    Col,
-    Tag,
-    Typography,
-    Button,
-    Modal,
-    Form,
-    Switch,
+    Card, Table,
+    Input, Select,
+    Row, Col,
+    Tag, Typography,
+    Button, Modal,
+    Form, Switch,
 } from 'antd';
 import { EditOutlined, FileExcelOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
