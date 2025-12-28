@@ -123,7 +123,7 @@ export default function Headers() {
                     alt="JupiNext Name Logo"
                     width={250}
                     height={100}
-                    prioritys />
+                />
             </div>
 
             {/* Desktop Menu */}

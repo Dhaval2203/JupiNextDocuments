@@ -267,7 +267,7 @@ export default function SalarySleepPage() {
                                         <Select placeholder="Select Employee">
                                             {EMPLOYEE_DATA.map((emp) => (
                                                 <Option key={emp.employeeId} value={emp.employeeId}>
-                                                    {emp.employeeId} - {emp.name}
+                                                    {emp.employeeId} - {emp.employeeName}
                                                 </Option>
                                             ))}
                                         </Select>
