@@ -30,6 +30,11 @@ const styles = StyleSheet.create({
         height: 42,
         marginRight: 12,
     },
+    compantName: {
+        width: 70,
+        height: 42,
+        marginRight: 12,
+    },
 
     companyBlock: {
         flexDirection: 'column',
@@ -232,7 +237,7 @@ export const SalarySlipPDF = ({ data, totals }) => {
                     <Image src="/JupiNext_Icon.png" alt="Logo" style={styles.logo} />
                     <View style={styles.companyBlock}>
                         <View style={styles.companyNameRow}>
-                            <Image src="/JupiNextName.png" alt="Logo" style={styles.logo} />
+                            <Image src="/JupiNextName.png" alt="Logo" style={styles.compantName} />
                         </View>
                         <Text style={styles.companyEmail}>{companyEmail}</Text>
                     </View>
@@ -336,8 +341,15 @@ export const SalarySlipPDF = ({ data, totals }) => {
                     </View>
                 </View>
 
-                {/* Stamp */}
-                <Image src="/JupiNext_Round_Seal.png" alt="Stamp" style={styles.stamp} />
+                {/* Stamp below Leave Balance, left-aligned */}
+                <View style={{ marginTop: 8 }}>
+                    <Image
+                        src="/JupiNext_Round_Seal.png"
+                        alt="Stamp"
+                        style={{ width: 75, height: 75 }}
+                    />
+                </View>
+
 
                 {/* Footer */}
                 <Text style={styles.footer}>
