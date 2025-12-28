@@ -160,7 +160,7 @@ export default function SalarySleepPage() {
                 ? values.monthYear.format('MMM_YYYY')
                 : dayjs().format('MMM_YYYY');
 
-        saveAs(blob, `${values.name || 'Employee'}_${monthYearText}.pdf`);
+        saveAs(blob, `${values.employeeName || 'Employee'}_${monthYearText}.pdf`);
     };
 
     const sendPDFByEmail = async () => {
@@ -175,7 +175,7 @@ export default function SalarySleepPage() {
                 ? values.monthYear.format('MMM_YYYY')
                 : dayjs().format('MMM_YYYY');
 
-            const fileName = `${values.name}_Salary_Slip_${monthYearText}.pdf`;
+            const fileName = `${values.employeeName}_Salary_Slip_${monthYearText}.pdf`;
 
             const pdfFile = new File([blob], fileName, {
                 type: 'application/pdf',
@@ -286,7 +286,7 @@ export default function SalarySleepPage() {
                         <Card title="Employee Details" style={{ borderRadius: 12, marginBottom: 24 }}>
                             <Row gutter={[16, 16]}>
                                 <Col xs={24} sm={12} lg={6}>
-                                    <Form.Item label="Name" name="name">
+                                    <Form.Item label="Name" name="employeeName">
                                         <Input disabled />
                                     </Form.Item>
                                 </Col>
@@ -437,7 +437,7 @@ export default function SalarySleepPage() {
                                     totals={totals}
                                 />
                             }
-                            fileName={`Salary_Slip_${salaryPDFData?.name || 'Employee'}_${salaryPDFData?.monthYear?.format
+                            fileName={`Salary_Slip_${salaryPDFData?.employeeName || 'Employee'}_${salaryPDFData?.monthYear?.format
                                 ? salaryPDFData.monthYear.format('MMM_YYYY')
                                 : dayjs().format('MMM_YYYY')
                                 }.pdf`}

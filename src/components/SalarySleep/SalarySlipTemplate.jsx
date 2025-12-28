@@ -248,7 +248,7 @@ export const SalarySlipPDF = ({ data, totals }) => {
                 <View style={styles.infoGrid}>
                     <View style={styles.gridRow}>
                         <Text style={styles.gridCellLabel}>Employee Name</Text>
-                        <Text style={styles.gridCellValue}>{data.name || '-'}</Text>
+                        <Text style={styles.gridCellValue}>{data.employeeName || '-'}</Text>
                         <Text style={styles.gridCellLabel}>Employee ID</Text>
                         <Text style={[styles.gridCellValue, { borderRightWidth: 0 }]}>
                             {data.employeeId || '-'}

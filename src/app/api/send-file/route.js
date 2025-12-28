@@ -84,7 +84,7 @@ export async function POST(req) {
                         <p style="margin-top:0;">
                             Dear
                             <strong style="color:${primaryColor};">
-                                ${employee.name}
+                                ${employee.employeeName}
                             </strong>,
                         </p>
 
