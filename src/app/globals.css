@@ -153,3 +153,29 @@ body {
     display: none;
   }
 }
+
+@keyframes recursiveFill {
+  0% {
+    background-color: var(--secondary-color);
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+
+  30% {
+    background-color: var(--primary-color);
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  60% {
+    background-color: var(--secondary-color);
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+
+  100% {
+    background-color: var(--secondary-color);
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+}

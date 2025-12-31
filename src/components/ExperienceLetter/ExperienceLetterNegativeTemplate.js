@@ -80,14 +80,14 @@ export default function ExperienceLetterNegativeTemplate({ employee, joiningDate
                     </View>
 
                     <Text style={styles.section}>
-                        This is to certify that <Text style={styles.bold}>{employee.name} </Text>
+                        This is to certify that <Text style={styles.bold}>{employee.employeeName} </Text>
                         <Text style={{ color: secondaryColor, fontWeight: 'bold' }}> (Employee ID: {employee.employeeId}) </Text>
                         was employed with us from <Text style={styles.bold}>{joiningDate} </Text>
                         to <Text style={styles.bold}>{relievingDate}</Text>.
                     </Text>
 
                     <Text style={styles.section}>
-                        During their tenure, {employee.name} held the position of <Text style={styles.bold}>{employee.designation} </Text>.
+                        During their tenure, {employee.employeeName} held the position of <Text style={styles.bold}>{employee.designation} </Text>.
                         While certain responsibilities were met, there were areas where performance required improvement.
                     </Text>
 
@@ -106,7 +106,7 @@ export default function ExperienceLetterNegativeTemplate({ employee, joiningDate
                     )}
 
                     <Text style={styles.section}>
-                        {employee.name} will benefit from focusing on professional development and enhancing key skills
+                        {employee.employeeName} will benefit from focusing on professional development and enhancing key skills
                         to succeed in future roles.
                     </Text>
 

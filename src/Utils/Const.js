@@ -1,6 +1,9 @@
 export const comapnyName = "JupiNext";
 export const companyEmail = "info@jupinext.com";
 export const companyPhone = "+91 98765 43210";
+
+export const CEO_EmployeeId = "JN-1";
+export const CTO_EmployeeId = "JN-2";
 export const menuItems = [
     { key: "salarysleep", label: "Salary Sleep" },
     { key: "offerletter", label: "Offer Letter" },

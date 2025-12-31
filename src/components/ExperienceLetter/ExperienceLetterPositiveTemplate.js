@@ -82,14 +82,14 @@ export default function ExperienceLetterPositiveTemplate({ employee, joiningDate
                     </View>
 
                     <Text style={styles.section}>
-                        This is to certify that <Text style={styles.bold}>{employee.name} </Text>
+                        This is to certify that <Text style={styles.bold}>{employee.employeeName} </Text>
                         <Text style={{ color: secondaryColor, fontWeight: 'bold' }}> (Employee ID: {employee.employeeId}) </Text>
                         was employed with us from <Text style={styles.bold}>{joiningDate} </Text>
                         to <Text style={styles.bold}>{relievingDate}</Text>.
                     </Text>
 
                     <Text style={styles.section}>
-                        During their tenure, {employee.name} held the position of <Text style={styles.bold}>{employee.designation} </Text>
+                        During their tenure, {employee.employeeName} held the position of <Text style={styles.bold}>{employee.designation} </Text>
                         and consistently demonstrated professionalism, dedication, and strong work ethic.
                     </Text>
 
@@ -108,7 +108,7 @@ export default function ExperienceLetterPositiveTemplate({ employee, joiningDate
                     )}
 
                     <Text style={styles.section}>
-                        {employee.name} maintained excellent relationships with colleagues and management,
+                        {employee.employeeName} maintained excellent relationships with colleagues and management,
                         and consistently contributed to a positive work environment.
                     </Text>
 
