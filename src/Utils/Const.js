@@ -8,7 +8,8 @@ export const menuItems = [
     { key: "salarysleep", label: "Salary Sleep" },
     { key: "offerletter", label: "Offer Letter" },
     { key: "experienceletter", label: "Experience Letter" },
-    { key: 'employeemanagement', label: 'Employee Management' }
+    { key: 'employeemanagement', label: 'Employee Management' },
+    // { key: 'welcomeletter', label: 'Welcome Letter' }
 ]
 
 export const notificationType = {
