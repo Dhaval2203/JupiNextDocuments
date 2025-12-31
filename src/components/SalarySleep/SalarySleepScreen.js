@@ -3,31 +3,57 @@
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import PrivateRoute from '../../components/PrivateRoute';
-import { logout } from '../../redux/authSlice';
 
-import { DownloadOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons';
+import { showToast } from '@/Utils/toast';
+import {
+    DownloadOutlined,
+    EyeOutlined,
+    MailOutlined,
+} from '@ant-design/icons';
 import { pdf } from '@react-pdf/renderer';
 import {
-    Button, Card, Col, DatePicker,
-    Form, Input,
-    InputNumber, Modal,
-    Row, Select, Table,
+    Button,
+    Card,
+    Col,
+    DatePicker,
+    Form,
+    Input,
+    InputNumber,
+    Modal,
+    Row,
+    Select,
+    Table,
     Typography,
 } from 'antd';
 import dayjs from 'dayjs';
 import { saveAs } from 'file-saver';
-import dynamic from "next/dynamic";
-import { useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 import {
-    accentColor, primaryBackgroundColor,
-    primaryColor, secondaryBackgroundColor,
-    secondaryColor, whiteColor,
+    accentColor,
+    primaryBackgroundColor,
+    primaryColor,
+    secondaryBackgroundColor,
+    secondaryColor,
+    whiteColor,
 } from '../../Utils/Colors';
-import { EMPLOYEE_DATA, deductionsData, earningsData, notificationType } from '../../Utils/Const';
-import { CustomCloseIcon, PreviewModalHeader, previewModalProps } from '../../Utils/UIStyles/uiStyles';
+
+import {
+    deductionsData,
+    earningsData,
+    notificationType,
+} from '../../Utils/Const';
+
+import {
+    CustomCloseIcon,
+    PreviewModalHeader,
+    previewModalProps,
+} from '../../Utils/UIStyles/uiStyles';
+
 import numberToWords from '../../Utils/UtilsFunction';
 import { SalarySlipPDF } from './SalarySlipTemplate';
-import { showToast } from '@/Utils/toast';
+import { getEmployees } from '@/services/employeeApi';
 
 const PDFDownloadLink = dynamic(
     () => import('@react-pdf/renderer').then((mod) => mod.PDFDownloadLink),
@@ -46,53 +72,50 @@ export default function SalarySleepPage() {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const handleLogout = () => {
-        dispatch(logout());
-        router.push('/login');
-    };
-
-
-    /* --------------------------------
-       Helper: Working Days
-    -------------------------------- */
-    const getWorkingDaysInMonth = (monthYear) => {
-        if (!monthYear) return 0;
-
-        const start = dayjs(monthYear).startOf('month');
-        const end = dayjs(monthYear).endOf('month');
-        let count = 0;
-
-        let current = start;
-
-        while (current.isBefore(end) || current.isSame(end, 'day')) {
-            const day = current.day();
-            if (day !== 0 && day !== 6) {
-                count++;
-            }
-            current = current.add(1, 'day');
-        }
-
-        return count;
-    };
-
+    const [employees, setEmployees] = useState([]);
+    const [loadingTable, setLoadingTable] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
-    const [isSending, setIsSending] = useState(false);
     const [sending, setSending] = useState(false);
 
     const [form] = Form.useForm();
     const values = Form.useWatch([], form);
     const slipRef = useRef(null);
 
-    const actionButtonStyle = {
-        minWidth: 160,
-        height: 44,
-        borderRadius: 14,
-        fontWeight: 600,
+    /* ---------------- Fetch Employees ---------------- */
+    const fetchEmployees = async () => {
+        try {
+            setLoadingTable(true);
+            const res = await getEmployees();
+            setEmployees(res.data || []);
+        } catch {
+            showToast(notificationType.error, 'Error', 'Failed to load employees');
+        } finally {
+            setLoadingTable(false);
+        }
     };
 
-    /* --------------------------------
-       Totals
-    -------------------------------- */
+    useEffect(() => {
+        fetchEmployees();
+    }, []);
+
+    /* ---------------- Working Days ---------------- */
+    const getWorkingDaysInMonth = (monthYear) => {
+        if (!monthYear) return 0;
+
+        const start = dayjs(monthYear).startOf('month');
+        const end = dayjs(monthYear).endOf('month');
+        let count = 0;
+        let current = start;
+
+        while (current.isBefore(end) || current.isSame(end, 'day')) {
+            const day = current.day();
+            if (day !== 0 && day !== 6) count++;
+            current = current.add(1, 'day');
+        }
+        return count;
+    };
+
+    /* ---------------- Totals ---------------- */
     const totals = useMemo(() => {
         const totalEarnings =
             (values?.basic || 0) +
@@ -115,9 +138,7 @@ export default function SalarySleepPage() {
         };
     }, [values]);
 
-    /* --------------------------------
-       Amount Column
-    -------------------------------- */
+    /* ---------------- Amount Column ---------------- */
     const amountColumn = () => ({
         title: 'Amount (₹)',
         align: 'right',
@@ -139,30 +160,29 @@ export default function SalarySleepPage() {
         ),
     });
 
-    /* --------------------------------
-       PDF Data
-    -------------------------------- */
+    /* ---------------- PDF Data ---------------- */
     const salaryPDFData = {
         ...values,
         netPayInWords: numberToWords(totals.netPay),
     };
 
-    /* --------------------------------
-       Generate & Save PDF
-    -------------------------------- */
+    /* ---------------- Download PDF ---------------- */
     const generatePDF = async () => {
         const blob = await pdf(
             <SalarySlipPDF data={salaryPDFData} totals={totals} />
         ).toBlob();
 
-        const monthYearText =
-            values.monthYear?.format
-                ? values.monthYear.format('MMM_YYYY')
-                : dayjs().format('MMM_YYYY');
+        const monthYearText = values.monthYear?.format
+            ? values.monthYear.format('MMM_YYYY')
+            : dayjs().format('MMM_YYYY');
 
-        saveAs(blob, `${values.employeeName || 'Employee'}_${monthYearText}.pdf`);
+        saveAs(
+            blob,
+            `${values.employeeName || 'Employee'}_${monthYearText}.pdf`
+        );
     };
 
+    /* ---------------- Send Email ---------------- */
     const sendPDFByEmail = async () => {
         try {
             setSending(true);
@@ -181,10 +201,14 @@ export default function SalarySleepPage() {
                 type: 'application/pdf',
             });
 
+            const emp = employees.find(
+                (e) => e.employeeId === values.employeeId
+            );
+
             const formData = new FormData();
             formData.append('file', pdfFile);
-            formData.append('employeeId', values.employeeId);
             formData.append('monthYear', monthYearText);
+            formData.append('employee', JSON.stringify(emp));
 
             const res = await fetch('/api/send-file', {
                 method: 'POST',
@@ -194,20 +218,27 @@ export default function SalarySleepPage() {
             const result = await res.json();
             if (!res.ok) throw new Error(result.error);
 
-            showToast(notificationType.success, 'Email Sent', 'Salary slip has been sent successfully.');
-            // Modal.success({
-            //     title: 'Email Sent',
-            //     content: 'Salary slip has been sent successfully.',
-            // });
-        } catch (err) {
-            showToast(notificationType.error, 'Error', 'Failed to send salary slip email.')
-            //  Modal.error({
-            //                 title: 'Error',
-            //                 content: 'Failed to send salary slip email.',
-            //             });
+            showToast(
+                notificationType.success,
+                'Email Sent',
+                'Salary slip has been sent successfully.'
+            );
+        } catch {
+            showToast(
+                notificationType.error,
+                'Error',
+                'Failed to send salary slip email.'
+            );
         } finally {
             setSending(false);
         }
+    };
+
+    const actionButtonStyle = {
+        minWidth: 160,
+        height: 44,
+        borderRadius: 14,
+        fontWeight: 600,
     };
 
     return (
@@ -222,7 +253,7 @@ export default function SalarySleepPage() {
                             marginBottom: 24,
                         }}
                     >
-                        <Title level={3} style={{ color: '#fff', marginBottom: 0 }}>
+                        <Title level={3} style={{ color: whiteColor, marginBottom: 0 }}>
                             Salary Slip
                         </Title>
                         <Text style={{ color: '#E5E7EB' }}>
@@ -239,7 +270,7 @@ export default function SalarySleepPage() {
                         }}
                         onValuesChange={(changedValues) => {
                             if (changedValues.employeeId) {
-                                const emp = EMPLOYEE_DATA.find(
+                                const emp = employees.find(
                                     (e) => e.employeeId === changedValues.employeeId
                                 );
                                 if (emp) form.setFieldsValue(emp);
@@ -253,19 +284,19 @@ export default function SalarySleepPage() {
                             }
                         }}
                     >
-                        {/* Month, Employee & Working Days */}
+                        {/* Month & Employee */}
                         <Card style={{ borderRadius: 12, marginBottom: 24 }}>
                             <Row gutter={[16, 16]}>
-                                <Col xs={24} md={12} lg={6}>
+                                <Col xs={24} md={6}>
                                     <Form.Item label="Salary Month" name="monthYear" required>
                                         <DatePicker picker="month" style={{ width: '100%' }} />
                                     </Form.Item>
                                 </Col>
 
-                                <Col xs={24} md={12} lg={6}>
+                                <Col xs={24} md={6}>
                                     <Form.Item label="Employee" name="employeeId" required>
                                         <Select placeholder="Select Employee">
-                                            {EMPLOYEE_DATA.map((emp) => (
+                                            {employees.map((emp) => (
                                                 <Option key={emp.employeeId} value={emp.employeeId}>
                                                     {emp.employeeId} - {emp.employeeName}
                                                 </Option>
@@ -274,7 +305,7 @@ export default function SalarySleepPage() {
                                     </Form.Item>
                                 </Col>
 
-                                <Col xs={24} md={12} lg={6}>
+                                <Col xs={24} md={6}>
                                     <Form.Item label="Working Days" name="workedDays">
                                         <InputNumber min={0} max={31} style={{ width: '100%' }} />
                                     </Form.Item>
@@ -285,36 +316,23 @@ export default function SalarySleepPage() {
                         {/* Employee Details */}
                         <Card title="Employee Details" style={{ borderRadius: 12, marginBottom: 24 }}>
                             <Row gutter={[16, 16]}>
-                                <Col xs={24} sm={12} lg={6}>
+                                <Col xs={24} md={6}>
                                     <Form.Item label="Name" name="employeeName">
                                         <Input disabled />
                                     </Form.Item>
                                 </Col>
-                                <Col xs={24} sm={12} lg={6}>
+                                <Col xs={24} md={6}>
                                     <Form.Item label="Designation" name="designation">
                                         <Input disabled />
                                     </Form.Item>
                                 </Col>
-                                <Col xs={24} sm={12} lg={6}>
+                                <Col xs={24} md={6}>
                                     <Form.Item label="Department" name="department">
                                         <Input disabled />
                                     </Form.Item>
                                 </Col>
-                                <Col xs={24} sm={12} lg={6}>
+                                <Col xs={24} md={6}>
                                     <Form.Item label="Date of Joining" name="doj">
-                                        <Input disabled />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Row gutter={[16, 16]}>
-                                <Col xs={24} sm={12} lg={6}>
-                                    <Form.Item label="Bank Name" name="bankName">
-                                        <Input disabled />
-                                    </Form.Item>
-                                </Col>
-                                <Col xs={24} sm={12} lg={6}>
-                                    <Form.Item label="Bank Account No." name="bankAccount">
                                         <Input disabled />
                                     </Form.Item>
                                 </Col>
@@ -324,11 +342,16 @@ export default function SalarySleepPage() {
                         {/* Earnings & Deductions */}
                         <Row gutter={[16, 16]}>
                             <Col xs={24} md={12}>
-                                <Card title="Earnings" style={{ borderRadius: 12, background: primaryBackgroundColor }}>
+                                <Card
+                                    title="Earnings"
+                                    style={{
+                                        borderRadius: 12,
+                                        background: primaryBackgroundColor,
+                                    }}
+                                >
                                     <Table
                                         size="small"
                                         pagination={false}
-                                        scroll={{ x: true }}
                                         dataSource={earningsData}
                                         columns={[
                                             { title: 'Type', dataIndex: 'label' },
@@ -340,11 +363,16 @@ export default function SalarySleepPage() {
                             </Col>
 
                             <Col xs={24} md={12}>
-                                <Card title="Deductions" style={{ borderRadius: 12, background: secondaryBackgroundColor }}>
+                                <Card
+                                    title="Deductions"
+                                    style={{
+                                        borderRadius: 12,
+                                        background: secondaryBackgroundColor,
+                                    }}
+                                >
                                     <Table
                                         size="small"
                                         pagination={false}
-                                        scroll={{ x: true }}
                                         dataSource={deductionsData}
                                         columns={[
                                             { title: 'Type', dataIndex: 'label' },
@@ -366,16 +394,15 @@ export default function SalarySleepPage() {
                             }}
                         >
                             <Row gutter={[16, 16]}>
-                                <Col xs={24} md={8}>
+                                <Col md={8}>
                                     <Text>Total Earnings</Text><br />
                                     <Text strong>₹ {totals.totalEarnings.toLocaleString()}</Text>
                                 </Col>
-                                <Col xs={24} md={8}>
+                                <Col md={8}>
                                     <Text>Total Deductions</Text><br />
                                     <Text strong>₹ {totals.totalDeductions.toLocaleString()}</Text>
                                 </Col>
-                                <Col xs={24} md={8}>
-                                    <Text style={{ fontSize: 16 }}>Net Pay</Text><br />
+                                <Col md={8}>
                                     <Text strong style={{ fontSize: 22, color: accentColor }}>
                                         ₹ {totals.netPay.toLocaleString()}
                                     </Text>
@@ -389,7 +416,7 @@ export default function SalarySleepPage() {
                     </Form>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Actions */}
                 <Row justify="end" gutter={[12, 12]} style={{ marginTop: 20 }}>
                     <Col>
                         <Button
@@ -415,7 +442,6 @@ export default function SalarySleepPage() {
                         <Button
                             icon={<MailOutlined />}
                             loading={sending}
-                            disabled={sending}
                             style={{ ...actionButtonStyle, background: accentColor, color: whiteColor }}
                             onClick={sendPDFByEmail}
                         >
@@ -424,36 +450,10 @@ export default function SalarySleepPage() {
                     </Col>
                 </Row>
 
-
-                {/* ================= PREVIEW MODAL ================= */}
+                {/* Preview Modal */}
                 <Modal
                     open={previewVisible}
                     onCancel={() => setPreviewVisible(false)}
-                    footer={
-                        <PDFDownloadLink
-                            document={
-                                <SalarySlipPDF
-                                    data={salaryPDFData}
-                                    totals={totals}
-                                />
-                            }
-                            fileName={`Salary_Slip_${salaryPDFData?.employeeName || 'Employee'}_${salaryPDFData?.monthYear?.format
-                                ? salaryPDFData.monthYear.format('MMM_YYYY')
-                                : dayjs().format('MMM_YYYY')
-                                }.pdf`}
-                        >
-                            <Button
-                                icon={<DownloadOutlined />}
-                                style={{
-                                    ...actionButtonStyle,
-                                    backgroundColor: secondaryColor,
-                                    color: whiteColor,
-                                }}
-                            >
-                                Download PDF
-                            </Button>
-                        </PDFDownloadLink>
-                    }
                     {...previewModalProps}
                     closeIcon={
                         <CustomCloseIcon
@@ -463,12 +463,8 @@ export default function SalarySleepPage() {
                     }
                 >
                     <PreviewModalHeader title="Salary Slip Preview" />
-
                     <PDFViewer width="100%" height="90%">
-                        <SalarySlipPDF
-                            data={salaryPDFData}
-                            totals={totals}
-                        />
+                        <SalarySlipPDF data={salaryPDFData} totals={totals} />
                     </PDFViewer>
                 </Modal>
             </Card>
