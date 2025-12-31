@@ -1,8 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { encryptData, decryptData } from '../Utils/secureStorage';
+
+const encryptedAuth = typeof window !== 'undefined'
+    ? localStorage.getItem('auth')
+    : null;
+
+const parsedAuth = encryptedAuth
+    ? decryptData(encryptedAuth)
+    : null;
 
 const initialState = {
-    isAuthenticated: false,
-    user: null,
+    employee: parsedAuth?.employee || null,
+    token: parsedAuth?.token || null,
+    isAuthenticated: !!parsedAuth?.token,
 };
 
 const authSlice = createSlice({
@@ -10,12 +20,23 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         login: (state, action) => {
+            const { employee, token } = action.payload;
+
+            state.employee = employee;
+            state.token = token;
             state.isAuthenticated = true;
-            state.user = action.payload;
+
+            // 🔐 Encrypt before storing
+            const encrypted = encryptData({ employee, token });
+            localStorage.setItem('auth', encrypted);
         },
+
         logout: (state) => {
+            state.employee = null;
+            state.token = null;
             state.isAuthenticated = false;
-            state.user = null;
+
+            localStorage.removeItem('auth');
         },
     },
 });

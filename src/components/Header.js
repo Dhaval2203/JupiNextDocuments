@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Button, Layout } from 'antd';
+import { Button, Layout, Popconfirm } from 'antd';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { TiThMenuOutline } from 'react-icons/ti';
@@ -14,6 +14,9 @@ import {
 } from '../Utils/Colors';
 import { menuItems } from '../Utils/Const';
 import { useRouter, usePathname } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/authSlice';
+
 const { Header } = Layout;
 
 const ClientMenu = dynamic(
@@ -37,14 +40,16 @@ const hexToRgba = (hex, opacity = 0.2) => {
 export default function Headers() {
     const router = useRouter();
     const pathname = usePathname();
+    const dispatch = useDispatch();
 
     const [selectedKey, setSelectedKey] = useState('salarysleep');
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    // Update selectedKey based on current route
     useEffect(() => {
         const activeItem = menuItems.find((item) =>
-            pathname === '/' ? item.key === 'salarysleep' : pathname.startsWith(item.key)
+            pathname === '/'
+                ? item.key === 'salarysleep'
+                : pathname.startsWith(item.key)
         );
 
         if (activeItem) {
@@ -60,7 +65,13 @@ export default function Headers() {
         router.push(key);
     };
 
-    // Prepare desktop menu items with underline for active and hover effect
+    /* ================= LOGOUT ================= */
+    const handleLogout = () => {
+        dispatch(logout());
+        setDrawerOpen(false);
+        router.replace('/login');
+    };
+
     const desktopMenuItems = menuItems.map((item) => ({
         key: item.key,
         label: (
@@ -71,14 +82,6 @@ export default function Headers() {
                     fontWeight: selectedKey === item.key ? 600 : 400,
                     paddingBottom: 4,
                     cursor: 'pointer',
-                    transition: 'color 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.color = secondaryColor;
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.color =
-                        selectedKey === item.key ? primaryColor : '#333';
                 }}
             >
                 {item.label}
@@ -91,7 +94,6 @@ export default function Headers() {
                             width: '100%',
                             height: 2,
                             backgroundColor: primaryColor,
-                            borderRadius: 2,
                         }}
                     />
                 )}
@@ -119,15 +121,11 @@ export default function Headers() {
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <Image src="/JupiNextIcon.png" alt="JupiNext Logo" width={50} height={50} />
-                <Image src="/JupiNextName.png"
-                    alt="JupiNext Name Logo"
-                    width={250}
-                    height={100}
-                />
+                <Image src="/JupiNextName.png" alt="JupiNext Name Logo" width={250} height={100} />
             </div>
 
             {/* Desktop Menu */}
-            <div className="desktop-menu">
+            <div className="desktop-menu" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <ClientMenu
                     mode="horizontal"
                     disabledOverflow
@@ -136,6 +134,23 @@ export default function Headers() {
                     items={desktopMenuItems}
                     style={{ borderBottom: 'none' }}
                 />
+
+                {/* Logout Button */}
+                <Popconfirm
+                    title="Logout"
+                    description="Are you sure you want to logout?"
+                    onConfirm={handleLogout}
+                    okText="Yes"
+                    cancelText="No"
+                >
+                    <Button
+                        type="primary"
+                        danger
+                        style={{ borderRadius: 8 }}
+                    >
+                        Logout
+                    </Button>
+                </Popconfirm>
             </div>
 
             {/* Mobile Menu Button */}
@@ -157,41 +172,23 @@ export default function Headers() {
                         key={item.key}
                         onClick={() => handleMenuClick({ key: item.key })}
                         style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
                             padding: '12px 16px',
                             cursor: 'pointer',
-                            backgroundColor:
-                                selectedKey === item.key
-                                    ? hexToRgba(primaryColor, 0.2)
-                                    : 'transparent',
-                            borderBottom: `1px solid ${accentColor}80`,
-                            borderRadius: 8,
-                            margin: '4px 0',
                         }}
                     >
-                        <span
-                            style={{
-                                color:
-                                    selectedKey === item.key
-                                        ? secondaryColor
-                                        : primaryColor,
-                                fontWeight: selectedKey === item.key ? 600 : 400,
-                            }}
-                        >
-                            {item.label}
-                        </span>
-                        {selectedKey === item.key && (
-                            <CiSquareCheck
-                                style={{
-                                    color: secondaryColor,
-                                    fontSize: 20,
-                                }}
-                            />
-                        )}
+                        {item.label}
                     </div>
                 ))}
+
+                {/* Mobile Logout */}
+                <Button
+                    danger
+                    block
+                    style={{ marginTop: 24 }}
+                    onClick={handleLogout}
+                >
+                    Logout
+                </Button>
             </ClientDrawer>
         </Header>
     );
