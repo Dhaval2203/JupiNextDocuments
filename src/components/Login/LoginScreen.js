@@ -50,7 +50,6 @@ export default function LoginScreen() {
             );
 
             const data = await res.json();
-            console.log("🚀 ~ onFinish ~ data:", data)
 
             if (!res.ok) {
                 throw new Error(data.message || 'Login failed');

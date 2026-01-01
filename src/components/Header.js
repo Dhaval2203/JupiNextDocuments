@@ -1,20 +1,24 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Button, Layout, Popconfirm } from 'antd';
+import {
+    Button,
+    Layout,
+    Popconfirm,
+    Avatar,
+    Popover,
+} from 'antd';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { TiThMenuOutline } from 'react-icons/ti';
-import { CiSquareCheck } from 'react-icons/ci';
 import {
-    accentColor,
     primaryColor,
     secondaryColor,
     whiteColor,
 } from '../Utils/Colors';
 import { menuItems } from '../Utils/Const';
 import { useRouter, usePathname } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/authSlice';
 
 const { Header } = Layout;
@@ -29,21 +33,19 @@ const ClientDrawer = dynamic(
     { ssr: false }
 );
 
-// Utility: hex → rgba
-const hexToRgba = (hex, opacity = 0.2) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-};
+import dayjs from 'dayjs';
 
 export default function Headers() {
     const router = useRouter();
     const pathname = usePathname();
     const dispatch = useDispatch();
 
+    /* ================= AUTH DATA ================= */
+    const { employee } = useSelector((state) => state.auth);
+
     const [selectedKey, setSelectedKey] = useState('salarysleep');
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
 
     useEffect(() => {
         const activeItem = menuItems.find((item) =>
@@ -59,13 +61,18 @@ export default function Headers() {
         }
     }, [pathname]);
 
+    const formatDate = (date) => {
+        if (!date) return '—';
+        return dayjs(date).format('DD/MMM/YYYY');
+    };
+
     const handleMenuClick = ({ key }) => {
         setSelectedKey(key);
         setDrawerOpen(false);
         router.push(key);
     };
 
-    /* ================= LOGOUT ================= */
+    /* ================= LOGOUT (UNCHANGED) ================= */
     const handleLogout = () => {
         dispatch(logout());
         setDrawerOpen(false);
@@ -101,6 +108,115 @@ export default function Headers() {
         ),
     }));
 
+    /* ================= PROFILE POPUP CONTENT ================= */
+    const profileContent = employee && (
+        <div
+            style={{
+                width: 320,
+                borderRadius: 12,
+                overflow: 'hidden',
+                background: whiteColor,
+            }}
+        >
+            {/* ===== HEADER ===== */}
+            <div
+                style={{
+                    background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+                    padding: '16px',
+                    color: whiteColor,
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <Avatar
+                        size={56}
+                        style={{
+                            backgroundColor: whiteColor,
+                            color: primaryColor,
+                            fontWeight: 700,
+                            fontSize: 22,
+                        }}
+                    >
+                        {employee.employeeName?.charAt(0)?.toUpperCase()}
+                    </Avatar>
+
+                    <div>
+                        <div style={{ fontWeight: 600, fontSize: 16 }}>
+                            {employee.employeeName}
+                        </div>
+                        <div style={{ fontSize: 13, opacity: 0.9 }}>
+                            {employee.designation}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ===== DATA SECTION ===== */}
+            <div
+                style={{
+                    padding: '14px 16px',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 12,
+                }}
+            >
+                <DataItem label="Employee ID" value={employee.employeeId} />
+                <DataItem label="Department" value={employee.department} />
+
+                {/* ✅ REPORTING MANAGER */}
+                {/* <DataItem
+                    label="Reporting Manager"
+                    value={
+                        employee.reportingManagerName
+                            ? `${employee.reportingManagerName}${employee.reportingManagerId ? ` (${employee.reportingManagerId})` : ''}`
+                            : '—'
+                    }
+                /> */}
+                <DataItem
+                    label="Date of Joining"
+                    value={formatDate(employee.dateOfJoining)}
+                />
+                <DataItem
+                    label="Date of Birth"
+                    value={formatDate(employee.dateOfBirth)}
+                />
+
+                <DataItem
+                    label="Primary Email"
+                    value={employee.primaryEmail}
+                    full
+                />
+                <DataItem
+                    label="Secondary Email"
+                    value={employee.secondaryEmail}
+                    full
+                />
+
+                <div style={{ gridColumn: '1 / -1', marginTop: 8 }}>
+                    <div
+                        style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: '#999',
+                            marginBottom: 6,
+                        }}
+                    >
+                        Bank Details
+                    </div>
+                </div>
+
+                <DataItem label="Bank Name" value={employee.bankName} />
+                <DataItem
+                    label="Account No."
+                    value={
+                        employee.bankAccount
+                            ? `XXXX XXXX ${employee.bankAccount.slice(-4)}`
+                            : ''
+                    }
+                />
+            </div>
+        </div>
+    );
+
     return (
         <Header
             suppressHydrationWarning
@@ -120,12 +236,25 @@ export default function Headers() {
         >
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <Image src="/JupiNextIcon.png" alt="JupiNext Logo" width={50} height={50} />
-                <Image src="/JupiNextName.png" alt="JupiNext Name Logo" width={250} height={100} />
+                <Image
+                    src="/JupiNextIcon.png"
+                    alt="JupiNext Logo"
+                    width={50}
+                    height={50}
+                />
+                <Image
+                    src="/JupiNextName.png"
+                    alt="JupiNext Name Logo"
+                    width={250}
+                    height={100}
+                />
             </div>
 
             {/* Desktop Menu */}
-            <div className="desktop-menu" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div
+                className="desktop-menu"
+                style={{ display: 'flex', alignItems: 'center', gap: 16 }}
+            >
                 <ClientMenu
                     mode="horizontal"
                     disabledOverflow
@@ -135,7 +264,34 @@ export default function Headers() {
                     style={{ borderBottom: 'none' }}
                 />
 
-                {/* Logout Button */}
+                {/* Profile Popup */}
+                {employee && (
+                    <Popover
+                        content={profileContent}
+                        trigger="click"
+                        placement="bottomRight"
+                        open={profileOpen}
+                        onOpenChange={setProfileOpen}
+                        styles={{
+                            body: {
+                                padding: 0,
+                                width: 420,   // 👈 FULL popover width
+                            },
+                        }}
+                    >
+                        <Avatar
+                            style={{
+                                backgroundColor: primaryColor,
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                            }}
+                        >
+                            {employee.employeeName?.charAt(0)?.toUpperCase()}
+                        </Avatar>
+                    </Popover>
+                )}
+
+                {/* Logout Button (UNCHANGED) */}
                 <Popconfirm
                     title="Logout"
                     description="Are you sure you want to logout?"
@@ -157,11 +313,15 @@ export default function Headers() {
             <Button
                 className="mobile-menu-btn"
                 type="text"
-                icon={<TiThMenuOutline style={{ color: secondaryColor, fontSize: 28 }} />}
+                icon={
+                    <TiThMenuOutline
+                        style={{ color: secondaryColor, fontSize: 28 }}
+                    />
+                }
                 onClick={() => setDrawerOpen(true)}
             />
 
-            {/* Mobile Drawer */}
+            {/* Mobile Drawer (UNCHANGED) */}
             <ClientDrawer
                 placement="right"
                 open={drawerOpen}
@@ -180,7 +340,6 @@ export default function Headers() {
                     </div>
                 ))}
 
-                {/* Mobile Logout */}
                 <Button
                     danger
                     block
@@ -191,5 +350,41 @@ export default function Headers() {
                 </Button>
             </ClientDrawer>
         </Header>
+    );
+}
+
+/* ================= DATA ITEM ================= */
+function DataItem({ label, value, full = false }) {
+    if (!value) return null;
+
+    return (
+        <div
+            style={{
+                gridColumn: full ? '1 / -1' : undefined,
+                background: '#fafafa',
+                border: '1px solid #f0f0f0',
+                borderRadius: 8,
+                padding: '10px 12px',
+            }}
+        >
+            <div
+                style={{
+                    fontSize: 11,
+                    color: '#888',
+                    marginBottom: 4,
+                }}
+            >
+                {label}
+            </div>
+            <div
+                style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    wordBreak: 'break-word',
+                }}
+            >
+                {value}
+            </div>
+        </div>
     );
 }
