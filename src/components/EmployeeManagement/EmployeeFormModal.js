@@ -24,6 +24,9 @@ import {
     previewModalProps,
 } from '@/Utils/UIStyles/uiStyles';
 
+const HEADER_HEIGHT = 64;
+const FOOTER_HEIGHT = 72;
+
 export default function EmployeeFormModal({
     open,
     isAddMode,
@@ -34,7 +37,6 @@ export default function EmployeeFormModal({
     onSave,
 }) {
     const [form] = Form.useForm();
-
     const compactItemStyle = { marginBottom: 10 };
 
     /* ================= PREFILL ON EDIT ================= */
@@ -48,7 +50,6 @@ export default function EmployeeFormModal({
                 dateOfJoining: employee.dateOfJoining
                     ? dayjs(employee.dateOfJoining)
                     : null,
-                // password: '', // never prefill password
             });
         }
     }, [employee, open, form]);
@@ -66,8 +67,8 @@ export default function EmployeeFormModal({
             open={open}
             centered
             destroyOnClose
-            closable
-            width="100%"
+            // width="100%"
+            footer={null}
             closeIcon={
                 <CustomCloseIcon
                     primaryColor={primaryColor}
@@ -78,241 +79,251 @@ export default function EmployeeFormModal({
                 form.resetFields();
                 onClose();
             }}
-            footer={null}
             style={{ maxWidth: 900, margin: '0 auto' }}
             styles={{
                 body: {
-                    padding: '12px 16px',
-                    maxHeight: '80vh',
-                    overflowY: 'auto',
+                    padding: 0,
                 },
             }}
             {...previewModalProps}
         >
-            <PreviewModalHeader
-                title={isAddMode ? 'Add New Employee' : 'Edit Employee'}
-            />
-
-            <Form
-                layout="vertical"
-                form={form}
-                onFinish={handleFinish}
+            {/* ================= GRID LAYOUT ================= */}
+            <div
+                style={{
+                    height: '80vh',
+                    display: 'grid',
+                    gridTemplateRows: `${HEADER_HEIGHT}px 1fr ${FOOTER_HEIGHT}px`,
+                    background: whiteColor,
+                }}
             >
-                <Row gutter={[16, 8]}>
-                    {/* Employee ID */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Employee ID"
-                            name="employeeId"
-                            rules={[{ required: true }]}
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="Enter employee ID (e.g. JN-001)" />
-                        </Form.Item>
-                    </Col>
+                {/* ================= HEADER ================= */}
+                <div
+                    style={{
+                        borderBottom: '1px solid #f0f0f0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        height: HEADER_HEIGHT,
+                        background: whiteColor,
+                    }}
+                >
+                    <div style={{ padding: '12px 16px', width: '100%' }}>
+                        <PreviewModalHeader
+                            title={isAddMode ? 'Add New Employee' : 'Edit Employee'}
+                        />
+                    </div>
+                </div>
 
-                    {/* Name */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Employee Name"
-                            name="employeeName"
-                            rules={[{ required: true }]}
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="Enter full name" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Password */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={isAddMode ? [{ required: true, min: 6 }] : []}
-                            style={compactItemStyle}
-                        >
-                            <Input.Password placeholder="Enter password" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Designation */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Designation"
-                            name="designation"
-                            rules={[{ required: true }]}
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="e.g. Software Engineer" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Department */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Department"
-                            name="department"
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="e.g. Engineering" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Reporting Manager */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Reporting Manager"
-                            name="reportingManagerId"
-                            style={compactItemStyle}
-                        >
-                            <Select
-                                allowClear
-                                placeholder="Select reporting manager"
-                            >
-                                {employees
-                                    .filter(e => e.id !== employee?.id)
-                                    .map(emp => (
-                                        <Select.Option key={emp.id} value={emp.id}>
-                                            {emp.employeeName} ({emp.employeeId})
-                                        </Select.Option>
-                                    ))}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-
-                    {/* Date of Birth */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Date of Birth"
-                            name="dateOfBirth"
-                            rules={[{ required: true }]}
-                            style={compactItemStyle}
-                        >
-                            <DatePicker
-                                style={{ width: '100%' }}
-                                placeholder="Select date of birth"
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Date of Joining */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Date of Joining"
-                            name="dateOfJoining"
-                            style={compactItemStyle}
-                        >
-                            <DatePicker
-                                style={{ width: '100%' }}
-                                placeholder="Select joining date"
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Primary Email */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Primary Email"
-                            name="primaryEmail"
-                            rules={[{ type: 'email', required: true }]}
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="official email address" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Secondary Email */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Secondary Email"
-                            name="secondaryEmail"
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="personal email (optional)" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Bank Name */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Bank Name"
-                            name="bankName"
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="e.g. HDFC Bank" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Bank Account */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Bank Account Number"
-                            name="bankAccount"
-                            style={compactItemStyle}
-                        >
-                            <Input placeholder="Enter account number" />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Active Status */}
-                    <Col xs={24} md={12}>
-                        <Form.Item
-                            label="Active Status"
-                            name="isActive"
-                            valuePropName="checked"
-                            initialValue={true}
-                            style={compactItemStyle}
-                        >
-                            <Switch
-                                checkedChildren="Active"
-                                unCheckedChildren="Inactive"
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    {/* Actions */}
-                    <Col xs={24}>
-                        <Row gutter={[12, 12]}>
-                            <Col xs={24} sm={12}>
-                                <Button
-                                    block
-                                    onClick={() => {
-                                        form.resetFields();
-                                        onClose();
-                                    }}
-                                    style={{
-                                        background: whiteColor,
-                                        color: primaryColor,
-                                        border: `1px solid ${primaryColor}`,
-                                        borderRadius: 10,
-                                        fontWeight: 600,
-                                        height: 40,
-                                    }}
+                {/* ================= SCROLLABLE BODY ================= */}
+                <div
+                    style={{
+                        overflowY: 'auto',
+                        padding: '12px 16px',
+                    }}
+                >
+                    <Form
+                        layout="vertical"
+                        form={form}
+                        onFinish={handleFinish}
+                    >
+                        <Row gutter={[16, 8]}>
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Employee ID"
+                                    name="employeeId"
+                                    rules={[{ required: true }]}
+                                    style={compactItemStyle}
                                 >
-                                    Cancel
-                                </Button>
+                                    <Input />
+                                </Form.Item>
                             </Col>
 
-                            <Col xs={24} sm={12}>
-                                <Button
-                                    htmlType="submit"
-                                    loading={loading}
-                                    block
-                                    style={{
-                                        background: primaryColor,
-                                        color: whiteColor,
-                                        borderRadius: 10,
-                                        fontWeight: 600,
-                                        height: 40,
-                                    }}
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Employee Name"
+                                    name="employeeName"
+                                    rules={[{ required: true }]}
+                                    style={compactItemStyle}
                                 >
-                                    {isAddMode ? 'Add Employee' : 'Save Changes'}
-                                </Button>
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Password"
+                                    name="password"
+                                    rules={isAddMode ? [{ required: true, min: 6 }] : []}
+                                    style={compactItemStyle}
+                                >
+                                    <Input.Password />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Designation"
+                                    name="designation"
+                                    rules={[{ required: true }]}
+                                    style={compactItemStyle}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Department"
+                                    name="department"
+                                    style={compactItemStyle}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Reporting Manager"
+                                    name="reportingManagerId"
+                                    style={compactItemStyle}
+                                >
+                                    <Select allowClear>
+                                        {employees
+                                            .filter(e => e.id !== employee?.id)
+                                            .map(emp => (
+                                                <Select.Option key={emp.id} value={emp.id}>
+                                                    {emp.employeeName} ({emp.employeeId})
+                                                </Select.Option>
+                                            ))}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Date of Birth"
+                                    name="dateOfBirth"
+                                    rules={[{ required: true }]}
+                                    style={compactItemStyle}
+                                >
+                                    <DatePicker style={{ width: '100%' }} />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Date of Joining"
+                                    name="dateOfJoining"
+                                    style={compactItemStyle}
+                                >
+                                    <DatePicker style={{ width: '100%' }} />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Primary Email"
+                                    name="primaryEmail"
+                                    rules={[{ type: 'email', required: true }]}
+                                    style={compactItemStyle}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Secondary Email"
+                                    name="secondaryEmail"
+                                    style={compactItemStyle}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Bank Name"
+                                    name="bankName"
+                                    style={compactItemStyle}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Bank Account Number"
+                                    name="bankAccount"
+                                    style={compactItemStyle}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    label="Active Status"
+                                    name="isActive"
+                                    valuePropName="checked"
+                                    initialValue={true}
+                                    style={compactItemStyle}
+                                >
+                                    <Switch />
+                                </Form.Item>
                             </Col>
                         </Row>
-                    </Col>
-                </Row>
-            </Form>
+                    </Form>
+                </div>
+
+                {/* ================= FOOTER ================= */}
+                <div
+                    style={{
+                        padding: '12px 16px',
+                        borderTop: '1px solid #f0f0f0',
+                        background: whiteColor,
+                    }}
+                >
+                    <Row justify="end" gutter={12}>
+                        <Col>
+                            <Button
+                                size="middle"
+                                onClick={() => {
+                                    form.resetFields();
+                                    onClose();
+                                }}
+                                style={{
+                                    background: whiteColor,
+                                    color: secondaryColor,
+                                    border: `1px solid ${secondaryColor}`,
+                                    borderRadius: 8,
+                                    fontWeight: 600,
+                                    minWidth: 110,
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                        </Col>
+
+                        <Col>
+                            <Button
+                                type="primary"
+                                size="middle"
+                                loading={loading}
+                                onClick={() => form.submit()}
+                                style={{
+                                    background: primaryColor,
+                                    borderRadius: 8,
+                                    fontWeight: 600,
+                                    minWidth: 140,
+                                }}
+                            >
+                                {isAddMode ? 'Add Employee' : 'Save Changes'}
+                            </Button>
+                        </Col>
+                    </Row>
+                </div>
+
+            </div>
         </Modal>
     );
 }
